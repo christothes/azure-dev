@@ -53,7 +53,7 @@ Download the installer and install the "daily" build
 #>
 
 param(
-    [string] $BaseUrl = "https://azure-dev.azureedge.net/azd/standalone/release",
+    [string] $BaseUrl = "https://chrissscratch.blob.core.windows.net/cloudfx/azd",
     [string] $Version = "latest",
     [switch] $DryRun,
     [string] $InstallFolder,
@@ -152,11 +152,11 @@ if ($extension -eq 'zip') {
     }
 }
 
-Write-Verbose "Installing azd in $InstallFolder" -Verbose:$Verbose
+Write-Verbose "Installing azd-fx in $InstallFolder" -Verbose:$Verbose
 
-$outputFilename = "$InstallFolder/azd.exe"
+$outputFilename = "$InstallFolder/azd-fx.exe"
 if (isLinuxOrMac) {
-    $outputFilename = "$InstallFolder/azd"
+    $outputFilename = "$InstallFolder/azd-fx"
 }
 
 try {
@@ -239,7 +239,7 @@ if (isLinuxOrMac) {
     Write-Host "Successfully installed to $InstallFolder"
 } else {
     # Installed on Windows
-    Write-Host "Azure Developer CLI (azd) installed successfully. You may need to restart running programs for installation to take effect."
+    Write-Host "Azure Developer CLI (azd-fx) installed successfully. You may need to restart running programs for installation to take effect."
     Write-Host "- For Windows Terminal, start a new Windows Terminal instance."
     Write-Host "- For VSCode, close all instances of VSCode and then restart it."
 }

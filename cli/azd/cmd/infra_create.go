@@ -1,8 +1,13 @@
 package cmd
 
 import (
+	"bufio"
 	"context"
 	"fmt"
+	"io"
+	"os"
+	"os/exec"
+	"path/filepath"
 
 	"github.com/azure/azure-dev/cli/azd/internal"
 	"github.com/azure/azure-dev/cli/azd/pkg/commands"
@@ -48,6 +53,7 @@ func (ica *infraCreateAction) SetupFlags(persis, local *pflag.FlagSet) {
 func (ica *infraCreateAction) Run(ctx context.Context, cmd *cobra.Command, args []string, azdCtx *azdcontext.AzdContext) error {
 	azCli := azcli.GetAzCli(ctx)
 	console := input.GetConsole(ctx)
+	// console.Confirm(ctx, input.ConsoleOptions{Message: "debug"})
 
 	if err := ensureProject(azdCtx.ProjectPath()); err != nil {
 		return err
@@ -77,6 +83,34 @@ func (ica *infraCreateAction) Run(ctx context.Context, cmd *cobra.Command, args 
 
 	formatter := output.GetFormatter(ctx)
 	writer := output.GetWriter(ctx)
+
+	// Run bootstrap script
+	initFilePath := filepath.Join(azdCtx.InfrastructureDirectory(), "azinit.Ps1")
+	if _, err := os.Stat(initFilePath); err == nil {
+		ps, _ := exec.LookPath("pwsh.exe")
+		cmd := exec.Command(ps, initFilePath)
+		pipe, _ := cmd.StdoutPipe()
+		if err := cmd.Start(); err != nil {
+			console.Message(ctx, err.Error())
+		} else {
+			console.Message(ctx, "Detected bootstrap script.")
+			go func(p io.ReadCloser) {
+				for {
+					reader := bufio.NewReader(p)
+					line, err := reader.ReadString('\n')
+					for err == nil {
+						fmt.Println(line)
+						line, err = reader.ReadString('\n')
+					}
+				}
+			}(pipe)
+
+			if err := cmd.Wait(); err != nil {
+				console.Message(ctx, err.Error())
+			}
+		}
+	}
+	// end bootstrap script
 
 	infraManager, err := provisioning.NewManager(ctx, env, prj.Path, prj.Infra, !ica.rootOptions.NoPrompt)
 	if err != nil {

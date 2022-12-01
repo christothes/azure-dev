@@ -81,7 +81,7 @@ extract() {
     fi
 }
 
-DEFAULT_BASE_URL="https://azure-dev.azureedge.net/azd/standalone/release"
+DEFAULT_BASE_URL="https://chrissscratch.blob.core.windows.net/cloudfx/azd"
 
 base_url="$DEFAULT_BASE_URL"
 platform="$(get_platform)"
@@ -132,7 +132,7 @@ do
         echo "Usage: $script_name [--version <VERSION>] [--install-location <LOCATION>]"
         echo "       $script_name -h|-?|--help"
         echo ""
-        echo "$script_name is a simple command for downloading and installing the azd CLI"
+        echo "$script_name is a simple command for downloading and installing the azd-fx CLI"
         echo ""
         echo "Options:"
         echo "  -u, --base-url <URL>          Download from the specific base URL. Defaults to"
@@ -156,7 +156,7 @@ do
         echo "  --dry-run                     Do not download or install, just display the"
         echo "                                download URL."
         echo ""
-        echo "  -i,--install-folder <FOLDER>  Install azd CLI to FOLDER. Default is"
+        echo "  -i,--install-folder <FOLDER>  Install azd-fx CLI to FOLDER. Default is"
         echo "                                /usr/local/bin"
         echo ""
         echo "  --verbose                     Enable verbose logging"
@@ -200,7 +200,7 @@ bin_name="azd-$platform-$architecture"
 extract "$compressed_file_path" "$bin_name" "$tmp_folder"
 chmod +x "$tmp_folder/$bin_name"
 
-install_location="$install_folder/azd"
+install_location="$install_folder/azd-fx"
 if [ -w "$install_folder/" ]; then
     mv "$tmp_folder/$bin_name" "$install_location"
 else
